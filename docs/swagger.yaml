@@ -1,0 +1,241 @@
+basePath: /
+definitions:
+  model.Book:
+    properties:
+      id:
+        example: 1
+        type: integer
+      isbn:
+        example: 978-0134190440
+        type: string
+      stock:
+        example: 5
+        type: integer
+      title:
+        example: The Go Programming Language
+        type: string
+    type: object
+  model.Borrower:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      id:
+        example: 1
+        type: integer
+      id_card_no:
+        example: ID12345678
+        type: string
+      name:
+        example: John Doe
+        type: string
+    type: object
+  model.Loan:
+    properties:
+      book:
+        $ref: '#/definitions/model.Book'
+      book_id:
+        example: 1
+        type: integer
+      borrow_date:
+        example: "2023-01-01T00:00:00Z"
+        type: string
+      borrower:
+        $ref: '#/definitions/model.Borrower'
+      borrower_id:
+        example: 1
+        type: integer
+      due_date:
+        example: "2023-01-15T00:00:00Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      is_late:
+        example: false
+        type: boolean
+      return_date:
+        example: "2023-01-10T00:00:00Z"
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: REST API for library management system
+  title: Library API
+  version: "1.0"
+paths:
+  /books:
+    get:
+      description: Get all books in the library
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Book'
+            type: array
+      summary: List all books
+      tags:
+      - books
+    post:
+      consumes:
+      - application/json
+      description: Add a new book to the library
+      parameters:
+      - description: Book object
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/model.Book'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Book'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new book
+      tags:
+      - books
+  /borrowers:
+    get:
+      description: Get all registered library members
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Borrower'
+            type: array
+      summary: List all borrowers
+      tags:
+      - borrowers
+    post:
+      consumes:
+      - application/json
+      description: Register a new library member
+      parameters:
+      - description: Borrower object
+        in: body
+        name: borrower
+        required: true
+        schema:
+          $ref: '#/definitions/model.Borrower'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Borrower'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new borrower
+      tags:
+      - borrowers
+  /loans:
+    get:
+      description: Get all loans with their status (on-time/late)
+      parameters:
+      - description: Filter by status (late/ontime)
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Loan'
+            type: array
+      summary: Get all loans
+      tags:
+      - loans
+    post:
+      consumes:
+      - application/json
+      description: Create a new book loan
+      parameters:
+      - description: Loan object
+        in: body
+        name: loan
+        required: true
+        schema:
+          $ref: '#/definitions/model.Loan'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Loan'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new loan
+      tags:
+      - loans
+  /loans/{id}/return:
+    put:
+      consumes:
+      - application/json
+      description: Mark a book as returned
+      parameters:
+      - description: Loan ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Loan'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Return a book
+      tags:
+      - loans
+schemes:
+- http
+- https
+swagger: "2.0"
